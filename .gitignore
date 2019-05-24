@@ -1,0 +1,12 @@
+node_modules
+build
+npm-debug.log
+.env
+.DS_Store
+
+# typescript only
+src/*.js
+
+# parcel
+dist
+.cache
