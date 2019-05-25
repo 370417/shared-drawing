@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 72px 32px 32px 72px;
     background: #453;
+    font-family: sans-serif;
 }
 #signin {
     position: relative;

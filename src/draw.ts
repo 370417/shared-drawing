@@ -2,6 +2,12 @@ import paper from 'paper';
 
 export function setupCanvas(canvas: HTMLCanvasElement) {
     paper.setup(canvas);
+
+    // white background
+    const rect = new paper.Rectangle(0, 0, canvas.width, canvas.height);
+    const rectPath = new paper.Path.Rectangle(rect);
+    rectPath.fillColor = 'white';
+
     const tool = new paper.Tool();
     let centerPath: paper.Path;
     let brushPaths: paper.Path[];

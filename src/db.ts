@@ -13,23 +13,6 @@
  *         (RTCIceCandidate)
  */
 
-export function sendSignal(
-    db: firebase.firestore.Firestore,
-    targetId: string,
-    userId: string,
-    type: 'offer' | 'answer' | 'ice',
-    content: string,
-) {
-    const userRef = db.collection('users').doc(userId);
-    const signalRef = userRef.collection('rooms').doc(targetId);
-    signalRef.update({
-        signal: {
-            type,
-            content,
-        },
-    });
-}
-
 export const TARGET_NOT_FOUND = 'Target user not found in database';
 
 /**
@@ -49,10 +32,15 @@ export async function signInSetup(
     if (targetSnapshot.empty) {
         throw new Error(TARGET_NOT_FOUND);
     }
-    const roomDoc = await targetSnapshot.docs[0].ref.get();
+    const targetUid = targetSnapshot.docs[0].id;
+    // const targetUserDoc = await targetSnapshot.docs[0].ref.get();
+    const roomDoc = await userRef.collection('rooms').doc(targetUid).get();
     if (!roomDoc.exists) {
+        console.log('create room');
         await roomDoc.ref.set({ imageUrl: createImageUrl(roomDoc.id, targetEmail, user) });
     }
+    console.log('room should exist')
+    alert()
     return targetSnapshot.docs[0].id;
 }
 

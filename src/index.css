@@ -9,10 +9,13 @@ body {
 video {
     background: white;
     display: block;
+    position: absolute;
+    top: 0;
+    left: 297px;
 }
 canvas {
     display: block;
     position: absolute;
     top: 0;
-    left: 0;
+    left: -297px;
 }

@@ -29,7 +29,7 @@ if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
     hideLoadingAnimation();
 }
 
-function getTarget(): Promise<string> {
+export function getTarget(): Promise<string> {
     const encodedTarget = new URLSearchParams(window.location.href).get('target');
     if (encodedTarget) {
         return Promise.resolve(decodeURIComponent(encodedTarget));
@@ -48,7 +48,8 @@ async function completeSignIn(): Promise<void> {
         throw new Error('User is undefined.');
     }
     const targetUid = await signInSetup(db, credential.user, targetEmail);
-    window.location.href = `${window.location.origin}/?target=${targetUid}`;
+    const encodedUid = encodeURIComponent(targetUid);
+    window.location.href = `${window.location.origin}/?target=${encodedUid}`;
 }
 
 function hideLoadingAnimation(): void {
@@ -87,10 +88,11 @@ function sendSignInLink({ targetEmail, userEmail }: Emails): void {
     }).catch(console.error);
 }
 
-function navigateToRoom({ targetEmail }: Emails): void {
+async function navigateToRoom(targetEmail: string, user: firebase.User): Promise<void> {
     submitButton.disabled = true;
-    const encodedEmail = encodeURIComponent(targetEmail);
-    window.location.href = `${window.location.origin}/?target=${encodedEmail}`;
+    const targetUid = await signInSetup(db, user, targetEmail);
+    const encodedUid = encodeURIComponent(targetUid);
+    window.location.href = `${window.location.origin}/?target=${encodedUid}`;
 }
 
 // Wait until signed in status is known before binding button callback
@@ -100,7 +102,15 @@ firebase.auth().onAuthStateChanged(function(user) {
         userInput.value = user.email || '';
         userInput.disabled = true;
         submitButton.onclick = function() {
-            getValidEmails().then(navigateToRoom).catch(console.error);
+            getValidEmails().then(function({ targetEmail }) {
+                return navigateToRoom(targetEmail, user);
+            }).catch(function(error) {
+                if (error instanceof Error && error.message == TARGET_NOT_FOUND) {
+                    console.log('yup');
+                } else {
+                    console.error(error);
+                }
+            });
         };
         signOutButton.style.display = 'block';
     } else {

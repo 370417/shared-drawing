@@ -6,32 +6,41 @@ import 'firebase/storage';
 
 import './firebase-init';
 import { setupCanvas } from './draw';
-import { createPeerConnection } from './rtc';
+import { Room } from './rtc';
 
 const db = firebase.firestore();
 
-const canvas = document.getElementById('canvas');
-const video = document.getElementById('video');
-
-// The query string can't change without page reload or the history API, which we don't use.
-const targetEmail = new URLSearchParams(window.location.search).get('target');
+const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+const video = document.getElementById('video') as HTMLVideoElement;
 
 firebase.auth().onAuthStateChanged(function(user) {
-    if (user && targetEmail) {
+    const encodedTargetUid = new URLSearchParams(window.location.search).get('target');
+    if (user && encodedTargetUid) {
+        const targetUid = decodeURIComponent(encodedTargetUid);
         // User is signed in and targetEmail is known.
-        if (user.email && canvas instanceof HTMLCanvasElement) {
+        if (user.email) {
             setupCanvas(canvas);
             // @ts-ignore (captureStream is not stable yet)
             const stream: MediaStream = canvas.captureStream(10);
             const track = stream.getTracks()[0];
-            createPeerConnection(db, targetEmail, user.email, track, stream, function(event) {
-                if (video instanceof HTMLVideoElement) {
-                    video.srcObject = event.streams[0];
-                }
-            });
+            new Room(
+                db,
+                targetUid,
+                user.uid,
+                track,
+                stream,
+                (event) => video.srcObject = event.streams[0],
+            );
+            // const connection = createPeerConnection(db, targetUid, user.uid, track, stream, function(event) {
+            //     if (video instanceof HTMLVideoElement) {
+            //         video.srcObject = event.streams[0];
+            //     }
+            // });
+            // receiveSignals(db, targetUid, user.uid, connection);
         }
     } else {
         // User is signed out and/or targetEmail is not set.
+        console.log(`${user} ${encodedTargetUid}`);
         window.location.href = `${window.location.origin}/signin/`;
     }
 });
