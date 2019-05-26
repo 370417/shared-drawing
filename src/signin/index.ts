@@ -2,7 +2,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 
-import '../firebase-init';
+import { baseUrl } from '../firebase-init';
 import { TARGET_NOT_FOUND, signInSetup } from '../db';
 
 const db = firebase.firestore();
@@ -49,7 +49,7 @@ async function completeSignIn(): Promise<void> {
     }
     const targetUid = await signInSetup(db, credential.user, targetEmail);
     const encodedUid = encodeURIComponent(targetUid);
-    window.location.href = `${window.location.origin}/?target=${encodedUid}`;
+    window.location.href = `${baseUrl}/?target=${encodedUid}`;
 }
 
 function hideLoadingAnimation(): void {
@@ -80,7 +80,7 @@ function getValidEmails(): Promise<Emails> {
 function sendSignInLink({ targetEmail, userEmail }: Emails): void {
     submitButton.disabled = true;
     firebase.auth().sendSignInLinkToEmail(userEmail, {
-        url: `${window.location.origin}/signin/?target=${encodeURIComponent(targetEmail)}`,
+        url: `${baseUrl}/signin/?target=${encodeURIComponent(targetEmail)}`,
         handleCodeInApp: true,
     }).then(() => {
         window.localStorage.setItem('emailForSignIn', userEmail);
@@ -92,7 +92,7 @@ async function navigateToRoom(targetEmail: string, user: firebase.User): Promise
     submitButton.disabled = true;
     const targetUid = await signInSetup(db, user, targetEmail);
     const encodedUid = encodeURIComponent(targetUid);
-    window.location.href = `${window.location.origin}/?target=${encodedUid}`;
+    window.location.href = `${baseUrl}/?target=${encodedUid}`;
 }
 
 // Wait until signed in status is known before binding button callback

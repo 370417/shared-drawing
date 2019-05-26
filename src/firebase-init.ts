@@ -10,3 +10,5 @@ const firebaseConfig = {
     appId: "1:714564832332:web:44eab73ad6e2d827"
 };
 firebase.initializeApp(firebaseConfig);
+
+export const baseUrl = 'https://as-f.github.io/shared-drawing/';
