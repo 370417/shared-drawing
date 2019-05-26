@@ -11,4 +11,4 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
-export const baseUrl = 'https://as-f.github.io/shared-drawing/';
+export const baseUrl = 'https://as-f.github.io/shared-drawing';
