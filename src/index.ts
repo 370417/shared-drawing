@@ -4,7 +4,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage';
 
-import './firebase-init';
+import { baseUrl } from './firebase-init';
 import { setupCanvas } from './draw';
 import { Room } from './rtc';
 
@@ -41,7 +41,7 @@ firebase.auth().onAuthStateChanged(function(user) {
     } else {
         // User is signed out and/or targetEmail is not set.
         console.log(`${user} ${encodedTargetUid}`);
-        window.location.href = `${window.location.origin}/signin/`;
+        window.location.href = `${baseUrl}/signin/`;
     }
 });
 
