@@ -14,9 +14,9 @@ const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const video = document.getElementById('video') as HTMLVideoElement;
 
 firebase.auth().onAuthStateChanged(function(user) {
-    const encodedTargetUid = new URLSearchParams(window.location.search).get('target');
-    if (user && encodedTargetUid) {
-        const targetUid = decodeURIComponent(encodedTargetUid);
+    const encodedTargetEmail = new URLSearchParams(window.location.search).get('target');
+    if (user && encodedTargetEmail) {
+        const targetEmail = decodeURIComponent(encodedTargetEmail);
         // User is signed in and targetEmail is known.
         if (user.email) {
             setupCanvas(canvas);
@@ -25,8 +25,8 @@ firebase.auth().onAuthStateChanged(function(user) {
             const track = stream.getTracks()[0];
             new Room(
                 db,
-                targetUid,
-                user.uid,
+                targetEmail,
+                user,
                 track,
                 stream,
                 (event) => video.srcObject = event.streams[0],
@@ -40,7 +40,6 @@ firebase.auth().onAuthStateChanged(function(user) {
         }
     } else {
         // User is signed out and/or targetEmail is not set.
-        console.log(`${user} ${encodedTargetUid}`);
         window.location.href = `${baseUrl}/signin/`;
     }
 });

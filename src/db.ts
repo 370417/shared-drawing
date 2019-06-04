@@ -5,8 +5,12 @@
  *   document id: user id
  *   - email
  *   - rooms subcollection
+<<<<<<< HEAD
  *     document id: other person's email (not uri encoded)
  *     - imageUrl (for storage)
+=======
+ *     document id: other person's email
+>>>>>>> master
  *     - signal map: (represents signal sent from user id to peer uid)
  *       - type: 'offer' | 'answer' | 'ice'
  *       - content: stringified JSON of either sdp (RTCSessionDescription) or ice 
@@ -28,6 +32,7 @@ export async function signInSetup(
     }
     const roomDoc = await userRef.collection('rooms').doc(targetEmail).get();
     if (!roomDoc.exists) {
+<<<<<<< HEAD
         await roomDoc.ref.set({ imageUrl: createImageUrl(targetEmail, user.email || '') });
     }
 }
@@ -42,5 +47,8 @@ function createImageUrl(targetEmail: string, userEmail: string) {
         return `${userEmail}/${targetEmail}.png`;
     } else {
         return `${targetEmail}/${userEmail}.png`;
+=======
+        await roomDoc.ref.set({});
+>>>>>>> master
     }
 }

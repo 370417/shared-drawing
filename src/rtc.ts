@@ -1,7 +1,9 @@
+import { User } from 'firebase';
+
 export class Room {
     db: firebase.firestore.Firestore;
-    targetUid: string;
-    userUid: string;
+    targetEmail: string;
+    user: User;
     track: MediaStreamTrack;
     stream: MediaStream;
     onAddTrack: (event: RTCTrackEvent) => any;
@@ -9,24 +11,33 @@ export class Room {
 
     constructor(
         db: firebase.firestore.Firestore,
-        targetUid: string,
-        userUid: string,
+        targetEmail: string,
+        user: User,
         track: MediaStreamTrack,
         stream: MediaStream,
         onAddTrack: (event: RTCTrackEvent) => any,
     ) {
         this.db = db;
-        this.targetUid = targetUid;
-        this.userUid = userUid;
+        this.targetEmail = targetEmail;
+        this.user = user;
         this.track = track;
         this.stream = stream;
         this.onAddTrack = onAddTrack;
         this.connection = this.createPeerConnection();
 
         // begin listening for signals
-        const targetUserRef = db.collection('users').doc(targetUid);
-        const roomRef = targetUserRef.collection('rooms').doc(userUid);
-        roomRef.onSnapshot(this.createSignalObserver());
+        const targetUserQuery = db.collection('users').where('email', '==', targetEmail);
+        const observer = this.createSignalObserver();
+        let unsubscribe: () => void | undefined;
+        targetUserQuery.onSnapshot(function (snapshot) {
+            if (!snapshot.empty) {
+                if (unsubscribe) {
+                    unsubscribe();
+                }
+                const roomRef = snapshot.docs[0].ref.collection('rooms').doc(user.email || '');
+                unsubscribe = roomRef.onSnapshot(observer);
+            }
+        }, console.error);
     }
 
     private createPeerConnection(): RTCPeerConnection {
@@ -60,8 +71,8 @@ export class Room {
         content: string,
     ) {
         console.log(`sending ${type}`);
-        const userRef = this.db.collection('users').doc(this.userUid);
-        const roomRef = userRef.collection('rooms').doc(this.targetUid);
+        const userRef = this.db.collection('users').doc(this.user.uid);
+        const roomRef = userRef.collection('rooms').doc(this.targetEmail);
         roomRef.update({
             signal: {
                 type,
