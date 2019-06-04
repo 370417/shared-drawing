@@ -3,19 +3,16 @@ body {
 }
 #container {
     position: relative;
-    width: 594px;
+    width: 400px;
     margin: 0 auto;
 }
 video {
     background: white;
     display: block;
-    position: absolute;
-    top: 0;
-    left: 297px;
 }
 canvas {
     display: block;
     position: absolute;
     top: 0;
-    left: -297px;
+    filter: url(#filter);
 }

@@ -3,7 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 
 import { baseUrl } from '../firebase-init';
-import { TARGET_NOT_FOUND, signInSetup } from '../db';
+import { signInSetup } from '../db';
 
 const db = firebase.firestore();
 
@@ -18,11 +18,7 @@ const invalidMsg = document.getElementById('invalid') as HTMLDivElement;
 
 if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
     completeSignIn().catch(function(error) {
-        if (error instanceof Error && error.message == TARGET_NOT_FOUND) {
-            console.log('yup');
-        } else {
-            console.error(error);
-        }
+        console.error(error);
         hideLoadingAnimation();
     });
 } else {
@@ -30,7 +26,7 @@ if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
 }
 
 export function getTarget(): Promise<string> {
-    const encodedTarget = new URLSearchParams(window.location.href).get('target');
+    const encodedTarget = new URLSearchParams(window.location.search).get('target');
     if (encodedTarget) {
         return Promise.resolve(decodeURIComponent(encodedTarget));
     } else {
@@ -47,9 +43,9 @@ async function completeSignIn(): Promise<void> {
     if (!credential.user) {
         throw new Error('User is undefined.');
     }
-    const targetUid = await signInSetup(db, credential.user, targetEmail);
-    const encodedUid = encodeURIComponent(targetUid);
-    window.location.href = `${baseUrl}/?target=${encodedUid}`;
+    await signInSetup(db, credential.user, targetEmail);
+    const encodedEmail = encodeURIComponent(targetEmail);
+    window.location.href = `${baseUrl}/?target=${encodedEmail}`;
 }
 
 function hideLoadingAnimation(): void {
@@ -90,9 +86,9 @@ function sendSignInLink({ targetEmail, userEmail }: Emails): void {
 
 async function navigateToRoom(targetEmail: string, user: firebase.User): Promise<void> {
     submitButton.disabled = true;
-    const targetUid = await signInSetup(db, user, targetEmail);
-    const encodedUid = encodeURIComponent(targetUid);
-    window.location.href = `${baseUrl}/?target=${encodedUid}`;
+    await signInSetup(db, user, targetEmail);
+    const encodedEmail = encodeURIComponent(targetEmail);
+    window.location.href = `${baseUrl}/?target=${encodedEmail}`;
 }
 
 // Wait until signed in status is known before binding button callback
@@ -104,13 +100,7 @@ firebase.auth().onAuthStateChanged(function(user) {
         submitButton.onclick = function() {
             getValidEmails().then(function({ targetEmail }) {
                 return navigateToRoom(targetEmail, user);
-            }).catch(function(error) {
-                if (error instanceof Error && error.message == TARGET_NOT_FOUND) {
-                    console.log('yup');
-                } else {
-                    console.error(error);
-                }
-            });
+            }).catch(console.error);
         };
         signOutButton.style.display = 'block';
     } else {

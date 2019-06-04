@@ -7,10 +7,19 @@
         <link rel="stylesheet" type="text/css" href="index.css">
     </head>
     <body>
-        <button id="save">Save</button>
+        <svg height="0">
+            <filter id="filter">
+                    <feColorMatrix values="0 0 0 0 0
+                                           0 0 0 0 0
+                                           0 0 0 0 0
+                                          -1 0 0 1 0"/> 
+                                          <!-- Look into Firefox bug where last row ending in -->
+                                          <!-- 0 1 instead of 1 0 causes a black frame around the canvas -->
+            </filter>
+        </svg>
         <div id="container">
-            <canvas id="canvas" width="594" height="841"></canvas>
-            <video id="video" autoplay muted playsinline width="594" height="841"></video>
+            <canvas id="canvas" width="400" height="566"></canvas>
+            <video id="video" autoplay muted playsinline width="400" height="566"></video>
         </div>
         <script src="./index.ts"></script>
     </body>
