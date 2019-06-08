@@ -1,0 +1,18 @@
+body {
+    background: #453;
+}
+#container {
+    position: relative;
+    width: 400px;
+    margin: 0 auto;
+}
+video {
+    background: white;
+    display: block;
+}
+canvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    filter: url(#filter);
+}
