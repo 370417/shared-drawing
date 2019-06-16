@@ -1,16 +1,18 @@
 import os
 import logging
-import gevent
+import eventlet
 from flask import Flask, render_template
-from flask_sockets import Sockets
 
-from db import db_session, init_db
+from db import init_db
 
-app = Flask(__name__)
-init_db()
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+#     os.path.join(app.instance_path, 'app.db')
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# init_db(app)
 
-sockets = Sockets(app)
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    db_session.remove()
+def create_app(config_filename=None):
+    app = Flask(__name__)
+    app.config.from_pyfile(config_filename)
+    init_db(app)
+    return app
