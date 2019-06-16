@@ -6,12 +6,11 @@ db = SQLAlchemy()
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.LargeBinary(16), unique=True)
+    id = db.Column(db.LargeBinary(16), primary_key=True)
 
-    def __init__(**kwargs):
-        super(Foo, self).__init__(**kwargs)
-        self.public_id = uuid4().bytes
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.id = uuid4().bytes
 
 
 def init_db(app):
